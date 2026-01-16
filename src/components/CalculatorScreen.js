@@ -41,7 +41,7 @@ const CalculatorScreen = () => {
       </ScrollView>
 
       {/* Fixed Advertisement Area */}
-      <AdSpace />
+      {/* <AdSpace /> */}
     </SafeAreaView>
   );
 };
