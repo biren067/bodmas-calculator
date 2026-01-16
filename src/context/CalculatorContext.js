@@ -69,7 +69,15 @@ const calculatorReducer = (state, action) => {
         return state;
       }
 
-      const newExpression = state.expression + input;
+      // Handle implicit multiplication: 5( becomes 5*( and )( becomes )*(
+      let newExpression = state.expression + input;
+      const lastChar = state.expression.slice(-1);
+      
+      if (input === "(" && lastChar && /\d|\)/.test(lastChar)) {
+        // Insert * before (
+        newExpression = state.expression + "*" + input;
+      }
+      
       const { result, error } = evaluateExpression(newExpression);
 
       return {

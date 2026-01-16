@@ -126,9 +126,14 @@ export const isValidInput = (currentExpression, input) => {
     }
   }
 
-  // Prevent opening bracket after digit
-  if (input === "(" && lastChar && /\d/.test(lastChar)) {
-    return false;
+  // Allow opening bracket after digit (for multiplication like 5(2+3))
+  // Allow opening bracket after operator or at start
+  if (input === "(") {
+    if (lastChar && /\d|\)/.test(lastChar)) {
+      // Insert implicit multiplication: 5( becomes 5*(
+      return true;
+    }
+    return true;
   }
 
   return true;
