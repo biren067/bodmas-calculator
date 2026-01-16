@@ -29,7 +29,7 @@ const Display = () => {
 
   const displayResult = useMemo(() => {
     if (error) {
-      return "Error";
+      return "";
     }
     if (result === null || result === undefined) {
       return "";
