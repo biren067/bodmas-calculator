@@ -10,8 +10,11 @@ import Display from "./Display";
 import ButtonsGrid from "./ButtonsGrid";
 import HistorySection from "./HistorySection";
 import AdSpace from "./AdSpace";
+import { useCalculator } from "../context/CalculatorContext";
 
 const CalculatorScreen = () => {
+  const { history } = useCalculator();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -32,8 +35,8 @@ const CalculatorScreen = () => {
           {/* Buttons */}
           <ButtonsGrid />
 
-          {/* History */}
-          <HistorySection />
+          {/* History - Only show if there is data */}
+          {history.length > 0 && <HistorySection />}
         </View>
       </ScrollView>
 

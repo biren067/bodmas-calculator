@@ -39,7 +39,7 @@ const HistorySection = () => {
 
       {isEmpty ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No calculations yet</Text>
+          <Text style={styles.emptyText}>Empty Calculations</Text>
         </View>
       ) : (
         <FlatList
