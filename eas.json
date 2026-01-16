@@ -1,0 +1,30 @@
+{
+  "cli": {
+    "version": ">= 5.4.0",
+    "promptToConfigurePushNotifications": false
+  },
+  "build": {
+    "production": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "preview": {
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "development": {
+      "development": true,
+      "distribution": "internal"
+    }
+  },
+  "submit": {
+    "production": {
+      "android": {
+        "serviceAccount": "./service-account.json",
+        "track": "internal"
+      }
+    }
+  }
+}

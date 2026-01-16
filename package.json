@@ -1,0 +1,46 @@
+{
+  "name": "bodmas-calculator",
+  "version": "1.0.0",
+  "description": "Production-ready React Native Expo calculator app with clean architecture",
+  "main": "node_modules/expo/AppEntry.js",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "eject": "expo eject",
+    "build:android": "eas build --platform android",
+    "submit:android": "eas submit --platform android"
+  },
+  "dependencies": {
+    "@expo/metro-runtime": "~3.1.3",
+    "expo": "~50.0.0",
+    "expo-constants": "~15.4.0",
+    "expr-eval": "^2.0.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-native": "0.73.0",
+    "react-native-gesture-handler": "~2.14.0",
+    "react-native-safe-area-context": "4.8.2",
+    "react-native-screens": "~3.27.0",
+    "react-native-web": "^0.19.13"
+  },
+  "devDependencies": {
+    "@types/react": "~18.2.0",
+    "@types/react-native": "^0.73.0",
+    "typescript": "^5.3.3"
+  },
+  "private": true,
+  "expo": {
+    "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": true
+          }
+        }
+      ]
+    ]
+  }
+}
