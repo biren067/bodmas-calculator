@@ -41,7 +41,7 @@ export const isValidExpression = (expression) => {
 export const evaluateExpression = (expression) => {
   try {
     if (!isValidExpression(expression)) {
-      return { result: null, error: "Invalid expression" };
+      return { result: null, error: "" };
     }
 
     const parser = new Parser();
@@ -57,7 +57,7 @@ export const evaluateExpression = (expression) => {
 
     return { result: rounded, error: null };
   } catch (error) {
-    return { result: null, error: "Invalid expression" };
+    return { result: null, error: "" };
   }
 };
 
@@ -99,6 +99,24 @@ export const isValidInput = (currentExpression, input) => {
   // Prevent operator at start (except -)
   if (["+", "*", "/"].includes(input) && currentExpression === "") return false;
 
+  // Handle consecutive operators/brackets - allow replacement of any operator/bracket with another
+  if (
+    ["+", "-", "*", "/", "(", ")"].includes(input) &&
+    ["+", "-", "*", "/", "(", ")"].includes(lastChar)
+  ) {
+    // Allow replacement of last operator/bracket, except:
+    // 1. Don't replace if typing - after operator (could be negative number)
+    // 2. Don't replace ) after ( (must have content between brackets)
+    if (input === "-" && ["+", "-", "*", "/", "("].includes(lastChar)) {
+      return true; // Allow negative numbers like 5 + -3
+    }
+    if (input === ")" && lastChar === "(") {
+      return false; // Don't allow empty brackets ()
+    }
+    // Allow replacement for all other cases
+    return true;
+  }
+
   // Prevent consecutive operators (except - after operator for negative numbers)
   if (
     ["+", "-", "*", "/", "("].includes(input) &&
@@ -126,9 +144,11 @@ export const isValidInput = (currentExpression, input) => {
     }
   }
 
-  // Allow opening bracket after digit (for multiplication like 5(2+3))
-  // Allow opening bracket after operator or at start
+  // Prevent opening bracket immediately after = or after operators without operand
   if (input === "(") {
+    // Don't allow ( right after =
+    if (lastChar === "=") return false;
+
     if (lastChar && /\d|\)/.test(lastChar)) {
       // Insert implicit multiplication: 5( becomes 5*(
       return true;

@@ -29,13 +29,14 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [],
-    "extra": {
-      "eas": {
-        "projectId": "your-project-id"
-      }
-    },
     "runtimeVersion": {
       "policy": "appVersion"
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "9e002389-3bac-4250-a2dd-6fa3448f45f5"
+      }
+    },
+    "owner": "biren067"
   }
 }

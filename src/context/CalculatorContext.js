@@ -42,20 +42,28 @@ const calculatorReducer = (state, action) => {
     case ACTIONS.ADD_INPUT: {
       const { input } = action.payload;
 
-      // If user starts new input after equals, start fresh
-      if (state.lastWasEquals && /\d/.test(input)) {
+      // If user types a digit, dot after equals, show error
+      if (state.lastWasEquals && (/\d/.test(input) || input === ".")) {
         return {
           ...state,
-          expression: input,
-          result: null,
+          error: "Only operators (+, −, ×, ÷) and brackets are allowed",
+        };
+      }
+
+      // Continue previous result with operator or bracket
+      if (state.lastWasEquals && ["+", "-", "*", "/"].includes(input)) {
+        const newExpression = state.result + input;
+        return {
+          ...state,
+          expression: newExpression,
           lastWasEquals: false,
           error: null,
         };
       }
 
-      // Continue previous result with operator
-      if (state.lastWasEquals && ["+", "-", "*", "/"].includes(input)) {
-        const newExpression = state.result + input;
+      // Allow opening bracket after equals - treat as implicit multiplication
+      if (state.lastWasEquals && input === "(") {
+        const newExpression = state.result + "*" + input;
         return {
           ...state,
           expression: newExpression,
@@ -69,15 +77,58 @@ const calculatorReducer = (state, action) => {
         return state;
       }
 
-      // Handle implicit multiplication: 5( becomes 5*( and )( becomes )*(
+      // Replace last operator/bracket if user types a different operator/bracket
       let newExpression = state.expression + input;
       const lastChar = state.expression.slice(-1);
-      
-      if (input === "(" && lastChar && /\d|\)/.test(lastChar)) {
-        // Insert * before (
+      const last2Chars = state.expression.slice(-2);
+
+      // Check if we should replace the last operator (NOT brackets)
+      const shouldReplace =
+        ["+", "-", "*", "/"].includes(input) && // Only operators can replace
+        ["+", "-", "*", "/"].includes(lastChar); // Only replace other operators
+
+      if (shouldReplace) {
+        // Replace the last operator with new operator
+        newExpression = state.expression.slice(0, -1) + input;
+      } else if (["+", "-", "*", "/"].includes(input) && last2Chars === "*(") {
+        // If last operator is *( and typing new operator, replace *(  with the new operator
+        // Example: 10*( + "+" → becomes 10+
+        newExpression = state.expression.slice(0, -2) + input;
+      } else if (["+", "-", "*", "/"].includes(input) && lastChar === "(") {
+        // If typing an operator after (, find and replace the last operator before the bracket
+        // Example: 17+( + "*" → becomes 17*(
+        const lastOperatorIndex = Math.max(
+          state.expression.lastIndexOf("+"),
+          state.expression.lastIndexOf("-"),
+          state.expression.lastIndexOf("*"),
+          state.expression.lastIndexOf("/"),
+        );
+
+        if (lastOperatorIndex !== -1) {
+          newExpression =
+            state.expression.slice(0, lastOperatorIndex) +
+            input +
+            state.expression.slice(lastOperatorIndex + 1);
+        }
+      } else if (input === "(" && lastChar && /\d|\)/.test(lastChar)) {
+        // Insert * before ( when last char is digit or closing bracket
+        // 1. 5( becomes 5*(
+        // 2. )( becomes )*(
         newExpression = state.expression + "*" + input;
+      } else if (
+        input === "(" &&
+        lastChar &&
+        lastChar !== "*" &&
+        ["+", "-", "*", "/"].includes(lastChar)
+      ) {
+        // Replace non-* operator with *( when ( is pressed after operator
+        // 10+ becomes 10*( (treat *( as single operator)
+        newExpression = state.expression.slice(0, -1) + "*" + input;
+      } else if (input === "(" && lastChar === "*") {
+        // If last char is already *, just add (
+        newExpression = state.expression + input;
       }
-      
+
       const { result, error } = evaluateExpression(newExpression);
 
       return {
@@ -123,7 +174,7 @@ const calculatorReducer = (state, action) => {
 
       return {
         ...state,
-        expression: `${state.expression} =`,
+        expression: "", // Clear expression, show only result
         result: result,
         history: newHistory,
         lastWasEquals: true,
